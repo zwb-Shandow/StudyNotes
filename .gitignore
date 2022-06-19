@@ -1,0 +1,9 @@
+.idea
+.vscode
+
+*.pyc
+
+bin/
+build/
+cmake-build-*
+.cache/
