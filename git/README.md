@@ -6,7 +6,7 @@
 
 ### 1.1 分区转换指令
 
-#### git add
+**git add**
 
 撤销 add
 
@@ -17,7 +17,7 @@ git reset HEAD
 git reset HEAD <file>
 ```
 
-#### git commit
+**git commit**
 
 撤销 commit
 
@@ -28,6 +28,14 @@ git reset --hard HEAD^
 git reset --soft HEAD^
 ```
 
-#### git push
+**git push**
+
+push到对应分支并覆盖
+
+```shell
+git push origin <branch> -f
+```
 
 ### 1.2 分区对比指令
+
+**git diff**

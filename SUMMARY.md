@@ -14,6 +14,6 @@
   - [单例模式](design_pattern/单例模式.md)
   - [工厂模式](design_pattern/工厂模式.md)
 - [git](git/README.md)
-
+  - [git规范](git/git规范.md)
 - [tools](tools/README.md)
   - [benchmark](code/benchmark)
