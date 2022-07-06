@@ -14,6 +14,7 @@
   * [STL](C++/STL/README.md)
     * [容器](C++/STL/容器.md)
   * [符号隐藏与依赖管理](C++/符号隐藏与依赖管理.md)
+  * [匿名命名空间](C++/匿名命名空间.md)
 * [design_patterm](design_pattern/README.md)
   * [单例模式](design_pattern/单例模式.md)
   * [工厂模式](design_pattern/工厂模式.md)
