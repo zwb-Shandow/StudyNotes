@@ -22,5 +22,6 @@
 * [git](git/README.md)
   * [git规范](git/git规范.md)
 * [docker](docker/README.md)
+* [计算机操作系统](computer_os/README.md)
 * [tools](tools/README.md)
   * [benchmark](code/benchmark)
