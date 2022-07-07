@@ -25,5 +25,6 @@
 * [计算机操作系统](computer_os/README.md)
 * [单元测试框架](unittest/README.md)
   * [Catch2](unittest/Catch2.md)
+  * [googletest](unittest/googletest.md)
 * [tools](tools/README.md)
   * [benchmark](code/benchmark)
