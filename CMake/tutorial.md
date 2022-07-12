@@ -1,11 +1,11 @@
-# CMake 使用教程
+# CMake 教程
 
 ## 1. CMake 示例
 
 ```cmake
 #======================================================================
 # 指定cmake最低版本
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.15)
 # 给项目命名
 project (demo) # 会隐式定义<project_name>_BINARY_DIR和<project_name>_SOURCE_DIR
 
@@ -264,6 +264,7 @@ else ()
 	message("not define address")
 endif
 ```
+
 ## 参考链接:
 
 [1] [https://blog.csdn.net/bbszhenshuai/article/details/106200228](https://blog.csdn.net/bbszhenshuai/article/details/106200228)
