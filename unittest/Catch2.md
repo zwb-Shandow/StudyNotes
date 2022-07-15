@@ -1,6 +1,15 @@
 # Catch2 单元测试框架
 
-## 1. 使用
+## 1. 特性
+
+- 断言宏
+- 日志记录宏
+- 测试夹具
+- 命令行工具
+- 数据生成器
+- 基准测试
+
+## 2. 使用
 
 Catch2 提供两类库，一类为利用框架自带 main 函数运行单元测试，另一类为自定义 main 函数运行单元测试；Catch2 同时支持 find_package 及 pkg-config 找包方式。
 
@@ -31,11 +40,11 @@ target_link_libraries(test ${CATCH_LIBRARIES})
 
 > 依赖 Catch2 编译的单元测试节点自带命令行属性
 
-## 2. 宏
+## 3. 宏
 
-### 2.1 测试宏
+### 3.1 测试宏
 
-#### 2.1.1 测试用例
+#### 3.1.1 测试用例
 
 ```c++
 TEST_CASE(test name, [,tags]){}  // tag 标签主要用于命令行工具
@@ -52,7 +61,7 @@ TEST_CASE(test name, [,tags]){}  // tag 标签主要用于命令行工具
 - [@<alias>]
 - [!benchmark]
 
-#### 2.1.2 夹具
+#### 3.1.2 夹具
 
 ```c++
 SECTION(section name, [, section description]){}
@@ -114,9 +123,9 @@ class UniqueTestsFixture {
  }
 ```
 
-### 2.2 断言宏
+### 3.2 断言宏
 
-#### 2.2.1 REQUIRE 家族
+#### 3.2.1 REQUIRE 家族
 
 > 测试不通过时会立即终止
 
@@ -126,7 +135,7 @@ class UniqueTestsFixture {
 - REQUIRE_THROWS(expression)
 - ...
 
-#### 2.2.2 CHECK 家族
+#### 3.2.2 CHECK 家族
 
 > 测试不通过时会继续执行
 
@@ -158,9 +167,9 @@ TEST_CASE("Qux") {
 - FAIL(message expression) : 记录消息并立即终止 case
 - CAPTURE(expression1, expression2, ...) : 捕获并记录中间变量
 
-## 3. 数据和参数驱动测试
+## 4. 数据和参数驱动测试
 
-### 3.1 数据生成器
+### 4.1 数据生成器
 
 ```c++
 TEST_CASE("Generators") {
@@ -178,9 +187,9 @@ TEST_CASE("Generators") {
 
 Catch2 支持自定义 GENERATE。
 
-## 4. 基准测试
+## 5. 基准测试
 
-### 4.1 简单用法
+### 5.1 简单用法
 
 ```c++
 #include <catch2/benchmark/catch_benchmark_all.hpp>
@@ -201,11 +210,11 @@ TEST_CASE("Fibonacci") {
 }
 ```
 
-### 4.2 高级用法
+### 5.2 高级用法
 
-## 5. 命令行工具使用
+## 6. 命令行工具使用
 
-### 5.1 测试报告生成
+### 6.1 测试报告生成
 
 ```shell
 --reporter JUnit::out=result-junit.xml --reporter XML::out=test.xml
