@@ -4,6 +4,8 @@ CMake 提供两种方式用于查找库，分别为 find_package 和 pkg-config�
 
 ## 1. find_package
 
+> 通过 CMAKE_PREFIX_PATH 指定 find_package 查找目录
+
 提供两种完全不同的方式来搜索，分别为 Module 模式和 Config 模式。
 
 - **Module mode**
@@ -105,6 +107,8 @@ install(FILES ${PROJECT_NAME}-config-version.cmake
 ```
 
 ## 2. pkg-config
+
+> 通过 PKG_CONFIG_PATH 指定 pkg-config 搜索路径
 
 ### 2.1 命令行工具
 
