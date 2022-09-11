@@ -68,3 +68,16 @@ git push origin <tag name>
 # 推送所有 tag
 git push origin --tags
 ```
+
+## 2. git subtree
+
+> 使用场景:
+>
+> 将项目 A 不丢失提交记录的情况下，合并到项目 B
+
+```shell
+git subtree add --prefix=rails git://github.com/rails/rails.git master
+```
+
+参考链接:[如何合并两个Git库](https://stackoverflow.com/questions/1425892/how-do-you-merge-two-git-repositories)
+
