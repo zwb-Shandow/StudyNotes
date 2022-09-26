@@ -9,3 +9,4 @@ linux 笔记
    desktop
    network_bridge
    time_sync
+   系统异常情况
