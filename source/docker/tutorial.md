@@ -123,6 +123,20 @@ docker cp <宿主机文件> <容器>:<容器内路径>
 docker build -t <name:tag> <Dockerfile path>
 ```
 
+- 将宿主机文件挂载至docker
+
+采用 -v 参数，若docker路径不存在，则会自动创建
+
+```shell
+docker run -d -p <宿主机端口:容器端口> --name <容器名称> -v /opt/source:/opt/traget <镜像id|镜像名称:tag>
+```
+
+采用 --mount 参数
+
+```shell
+docker run -d -p <宿主机端口:容器端口> --name <容器名称> --mount type=bind,source=/opt/source,target=/opt/target <镜像id|镜像名称:tag>
+```
+
 ### 2.4 数据卷
 
 ```shell
