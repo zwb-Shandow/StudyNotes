@@ -20,6 +20,7 @@
    计算机网络/index
    网络编程/index
    操作系统/index
+   数据结构与算法/index
 
 
 Indices and tables
