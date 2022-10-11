@@ -4,20 +4,25 @@
 
 ## 1. 常用命令
 
-### 1.1 分区转换指令
-
-**git add**
-
-- 撤销
+### 1.1 git add
 
 ```shell
+# 将文件添加到暂存区
+git add <file>
 # 撤销上次所有 add
 git reset HEAD
 # 撤销单个文件 add
 git reset HEAD <file>
 ```
 
-**git commit**
+**git push**
+
+```shell
+# push 到对应分支并覆盖 
+git push origin <branch> -f
+```
+
+### 1.2 git commit
 
 - 覆盖 commit
 
@@ -35,18 +40,13 @@ git reset --hard HEAD^
 git reset --soft HEAD^
 ```
 
-**git push**
+### 1.3 git rebase
 
 ```shell
-# push 到对应分支并覆盖 
-git push origin <branch> -f
+git rebase <branch> # rebase 到指定分支
 ```
 
-### 1.2 分区对比指令
-
-**git diff**
-
-### 1.3 版本 tag
+### 1.4 git tag
 
 - tag 拉取及查看
 
@@ -67,6 +67,8 @@ git tag <tag name> <commit id> -m "information"
 git push origin <tag name>
 # 推送所有 tag
 git push origin --tags
+# 删除 tag
+git tag -d <tag name>
 ```
 
 ## 2. git subtree
@@ -81,3 +83,10 @@ git subtree add --prefix=rails git://github.com/rails/rails.git master
 
 参考链接:[如何合并两个Git库](https://stackoverflow.com/questions/1425892/how-do-you-merge-two-git-repositories)
 
+## 3. git cherry-pick
+
+> 使用场景:
+>
+> 将指定的 commit 应用与其他分支
+
+参考链接:[git cherry-pick 教程](https://www.ruanyifeng.com/blog/2020/04/git-cherry-pick.html)
