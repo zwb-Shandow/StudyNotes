@@ -10,3 +10,4 @@ linux 笔记
    network_bridge
    time_sync
    系统异常情况
+   配置文件相关
