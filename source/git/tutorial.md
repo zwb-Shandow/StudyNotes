@@ -56,7 +56,7 @@ git tag --list
 git show <tag name>
 ```
 
-- tag 及推送
+- tag 推送及删除
 
 ```shell
 # 为 HEAD 打 tag
@@ -67,8 +67,21 @@ git tag <tag name> <commit id> -m "information"
 git push origin <tag name>
 # 推送所有 tag
 git push origin --tags
-# 删除 tag
+# 删除本地 tag
 git tag -d <tag name>
+# 删除远程 tag
+git push origin :refs/tags/tag_name
+```
+
+### 1.5 git branch
+
+```shell
+#  删除一条分支
+git branch -D <branch name>
+# 删除当前分支外的所有分支
+git branch | xargs git branch -d
+# 删除远程分支
+git push origin :branch_name
 ```
 
 ## 2. git subtree
