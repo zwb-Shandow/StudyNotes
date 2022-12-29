@@ -14,3 +14,7 @@ find_package(catkin)
 **解决方案**
 
 [Remove Catkin artifacts from CPack build](https://stackoverflow.com/questions/50486421/remove-catkin-artifacts-from-cpack-build)
+
+## 2. diagnostic
+
+[diagnostic_analysis](http://wiki.ros.org/diagnostic_analysis)
