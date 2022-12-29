@@ -4,6 +4,8 @@ C++ 笔记
 .. toctree::
    :maxdepth: 2
 
+   类型系统
+   泛型的本质
    static
    函数指针
    匿名命名空间
