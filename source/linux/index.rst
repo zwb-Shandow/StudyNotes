@@ -11,3 +11,5 @@ linux 笔记
    time_sync
    系统异常情况
    配置文件相关
+   ssh
+   文件权限
