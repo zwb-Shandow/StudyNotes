@@ -4,7 +4,6 @@ C++ 笔记
 .. toctree::
    :maxdepth: 2
 
-   类型系统
    泛型的本质
    static
    函数指针
@@ -20,3 +19,4 @@ C++ 笔记
    return_type_postfix
    多线程
    联合体
+   using
