@@ -18,3 +18,24 @@ find_package(catkin)
 ## 2. diagnostic
 
 [diagnostic_analysis](http://wiki.ros.org/diagnostic_analysis)
+
+## 3. boost占位符未定义
+
+**问题描述**
+
+- ros16.04 依赖 boost1.58，占位符为 `_1`
+- ros18.04 依赖 boost1.60，占位符为 `boost::placeholders::_1`
+
+**解决方案**
+
+```c++
+#include <boost/version.hpp>
+#if BOOST_VERSION >= 106000
+	using boost::placeholders::_1;
+	using boost::placeholders::_2;
+	using boost::placeholders::_3;
+#endif
+```
+
+参考链接: [https://github.com/freeorion/freeorion/issues/3172](https://github.com/freeorion/freeorion/issues/3172)
+
