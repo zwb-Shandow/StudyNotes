@@ -134,6 +134,7 @@ apt-cache search <pkg>    # 使用关键字pkg搜索软件包（在缓存中搜�
 apt-cache depends <pkg>   # 查看pkg所依赖的软件包
 apt-cache rdepends <pkg>  # 查看pkg被那些软件包所依赖
 apt-cache policy <pkg>    # 查看pkg的来自于哪个源及已缓存的版本
+apt-cache madison <pkg>   # 查看缓存中pkg软件包的所有版本
 ```
 
 ## 6. dpkg

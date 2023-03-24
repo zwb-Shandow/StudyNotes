@@ -36,6 +36,52 @@ ssh -oHostKeyAlgorithms='ssh-rsa' 192.168.1.89
 
 [A is not in your SSH known_hosts file.](https://answers.ros.org/question/41446/a-is-not-in-your-ssh-known_hosts-file/)
 
+## 3. 常用命令
+
+**使用ssh连接远程主机**
+
+```shell
+ssh user@hostname
+```
+
+**使用ssh连接到其他端口**
+
+```shell
+# SSH 默认连接到目标主机的22端口，可以使用-p选项指定端口号
+ssh -p 10022 user@ip
+```
+
+**使用ssh在远程主机执行一条命令并显示到本地**
+
+```shell
+ssh user@ip ls -l
+```
+
+**在远程主机运行一个图形界面的程序**
+
+```shell
+ssh -X user@ip
+```
+
+**构建ssh密钥对**
+
+```shell
+# 常用rsa或者dsa算法
+ssh-keygen -t rsa
+```
+
+**查看是否已经添加了对应主机的密钥**
+
+```shell
+ssh-keygen -F ip
+```
+
+**删除主机密钥**
+
+```shell
+ssh-keygen -R ip
+```
+
 ## 参考链接
 
 [1] [SSH基本知识](https://wangdoc.com/ssh/basic)

@@ -1,8 +1,7 @@
-中间件
+nginx
 ==========
 
 .. toctree::
    :maxdepth: 2
 
-   ros1
-   rosbags
+   nginx

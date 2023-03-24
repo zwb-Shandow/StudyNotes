@@ -54,6 +54,8 @@ git rebase <branch> # rebase 到指定分支
 git fetch --tags
 git tag --list
 git show <tag name>
+# 查看所有tag及打tag的日期
+git log --tags --simplify-by-decoration --pretty="format:%ci %d"
 ```
 
 - tag 推送及删除

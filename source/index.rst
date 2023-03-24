@@ -9,7 +9,9 @@
 .. toctree::
    :maxdepth: 2
 
+   语言共性/index
    C++/index
+   python/index
    CMake/index
    设计模式/index
    docker/index
@@ -23,6 +25,11 @@
    数据结构与算法/index
    守护进程/index
    中间件/index
+   STL/index
+   CICD/index
+   Nginx/index
+   工程化/index
+   CSAPP/index
 
 
 Indices and tables
