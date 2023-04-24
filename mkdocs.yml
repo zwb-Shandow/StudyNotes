@@ -1,0 +1,32 @@
+site_name: My Study Notes
+site_url: http://example.com
+docs_dir: docs
+use_directory_urls: false
+theme: 
+  name: 'material'
+  nav_style: dark
+
+markdown_extensions::
+  - toc:
+    permalink: True
+  - footnotes
+  - tables
+
+nav:
+    - Home: index.md
+    - C++: C++.md 
+    - CICD: cicd.md
+    - CMake: cmake.md
+    - CSAPP: csapp.md
+    - MIT: MIT.md
+    - Docker: docker.md
+    - Data Structure And Algorithm: data_and_algorithm.md
+    - Design Pattern: design_pattern.md
+    - Git: git.md
+    - Linux: linux.md
+    - Nginx: nginx.md
+    - Python: python.md
+    - Software Engineering: se.md
+    - MiddleWare: middleware.md
+    - UnitTest: unittest.md
+    - 类型系统: 类型系统.md

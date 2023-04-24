@@ -1,2 +1,0 @@
-atomic and memory order
-=========================

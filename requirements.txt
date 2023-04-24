@@ -1,5 +1,3 @@
 sphinx
-sphinx-rtd-theme
-recommonmark
-markdown
-sphinx_markdown_tables
+mkdocs
+mkdocs-material
