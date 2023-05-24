@@ -203,6 +203,96 @@ docker run -v 路径：容器内部路径 镜像id
 >
 > 可以在宿主机中操作目录中的内容，那么容器内部映射的文件也会一起改变
 
+### 2.6 镜像/容器迁移
+
+#### 镜像迁移
+
+Docker镜像迁移主要有两种方式:
+
+1. export 和 import 镜像
+
+- 在源机器上执行`docker image save`命令导出镜像到tarball文件:
+
+```bash
+docker image save [IMAGE ID] > ubuntu.tar
+```
+
+- 将导出的ubuntu.tar文件拷贝到目标机器
+- 在目标机器上执行`docker image load`命令导入镜像:
+
+```bash
+docker image load < ubuntu.tar
+```
+
+- 导入成功后,目标机器上会有和源机器同名的镜像,可以直接基于该镜像运行容器。
+
+这种方式比较简单,但是只适用于小规模镜像的迁移,无法支持分层存储等功能。
+
+2. 将镜像推送到Docker Registry,然后在目标机器上拉取
+
+- 在源机器上执行`docker image push`命令将镜像推送到Registry:
+
+```bash
+docker image push [IMAGE NAME]:[TAG] 
+```
+
+- 在目标机器上执行`docker image pull`命令从Registry拉取镜像:
+
+```bash
+docker image pull [IMAGE NAME]:[TAG]
+```
+
+- 拉取成功后,目标机器上会有来自Registry的同名镜像,可以直接使用。
+
+这种方式可以支持任意规模的镜像迁移,并且实现云端与本地的镜像同步。但是需要提前部署Docker Registry。
+
+#### 容器迁移
+
+Docker容器迁移主要有两种方式:
+
+1. export 和 import 容器
+
+- 在源机器执行`docker export`命令导出容器到tarball归档文件:
+
+```bash
+docker export [CONTAINER ID] > [FILENAME].tar
+```
+
+- 将导出的tarball文件拷贝到目标机器
+
+- 在目标机器上执行`docker import`命令导入容器:
+
+```bash
+docker import [FILENAME].tar [REPOSITORY]:[TAG]
+```
+
+这中方式简单，但是不支持容器的运行状态和数据卷迁移
+
+2. 使用 docker 镜像迁移
+
+- 在源机器上执行`docker commit`命令将容器制作成镜像:
+
+```bash
+docker commit [CONTAINER ID] [REPOSITORY]:[TAG]
+```
+
+- 在目标机器上执行`docker pull`命令拉取这个镜像:
+
+```bash
+docker pull [REPOSITORY]:[TAG]
+```
+
+- 使用拉取的镜像在目标机器启动一个新的容器,然后将原容器的数据卷与之关联迁移:
+
+```bash
+docker run -v /data --name [NEW_CONTAINER] [REPOSITORY]:[TAG]
+```
+
+- 拷贝源容器中的数据卷内容到目标机器的数据卷位置
+- 重新启动目标容器即完成迁移
+
+这种方式可以支持容器运行状态和数据卷的迁移,实现真正意义上的容器迁移,是推荐的方式。以上介绍的两种方式,也可以结合Docker Registry来实现,将镜像推送到Registry,然后在目标机器从Registry上拉取镜像来完成迁移。这可以实现云端容器与本地容器的迁移。总体来说,利用Docker的镜像和数据卷的迁移能力,Docker容器可以跨机器乃至跨平台实现比较完整的迁移。这为Docker的多平台、混合云部署和高可用提供了重要支撑。
+
 ## 3. Dockerfile
 
 通过 `Dockerfile` 文件，构建自定义的镜像

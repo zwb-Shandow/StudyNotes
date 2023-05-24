@@ -191,6 +191,11 @@ lsmode  # linux下的驱动有两种形式。一种是加载到内核中的，�
 
 ## 10. pkg-config
 
+```bash
+pkg-config --modversion <package_name>     # 查看package的具体版本
+pkg-config --cflags --libs <package_name>  # 显示库的编译器标志及链接标志
+```
+
 [https://man.openbsd.org/pkg-config.1](https://man.openbsd.org/pkg-config.1)
 
 ## 11. du & df

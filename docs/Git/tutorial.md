@@ -133,7 +133,11 @@ git commit --amend
 
 通过 vim 修改 commit message 后需要强推至远程仓库。
 
-### 4.2 修改指定提交的commit
+### 4.2 修改/删除指定提交的commit
+
+以下提供两种修改指定commit的方法，推荐用rebase方法，更加简洁。
+
+#### patch方式
 
 (1) 获取指定 commit，通过打补丁方式将该 commit 之后的提交逐个暂存
 
@@ -168,5 +172,20 @@ git am 0002-feat-b.patch
 git push orign <branch> -f
 ```
 
+#### rebase方式
 
+(1) 获取要修改 commit 的前一次 commit id
 
+(2) 修改指定 commit
+
+```bash
+git rebase -i <commit id>
+```
+
+(3) 在交互终端中重写/删除指定 commit
+
+<img src="../Pic/git_rebase.png" style="zoom:50%;" />
+
+- commit 前的 pick 改为 drop，即可删除该条commit
+
+- commit 前的 pick 改为 reword，即可在新的交互界面中更改 commit message

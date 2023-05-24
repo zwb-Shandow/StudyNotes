@@ -1,4 +1,5 @@
 # C++ 笔记
+ - [三大特性](./C++/三大特性.md)
  - [泛型的本质](./C++/泛型的本质.md)
  - [static](./C++/static.md)
  - [函数指针](./C++/函数指针.md)
@@ -22,6 +23,9 @@
  - [type traits快速入门](./C++/type_traits.md)
  - [typename](./C++/typename.md)
  - [operator](./C++/operator.md)
+ - [new vs malloc](./C++/new_malloc.md)
+ - [编译器](./C++/g++.md)
  - STL
     - [概述](./C++/STL/概述.md)
     - [迭代器](./C++/STL/iterator.md)
+    - [容器](./C++/STL/容器.md)

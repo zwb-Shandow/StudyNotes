@@ -180,6 +180,8 @@ test.launch
 </launch>
 ```
 
+如果存在 ROS_IP 不生效的情况，则需要排查是否设置了 ROS_HOSTNAME，详细参考[ROS_IP/ROS_HOSTNAME](http://wiki.ros.org/ROS/EnvironmentVariables)。通常 ROS_HOSTNAME 设定后，需要同步更新DNS文件。
+
 ## 6 ros TCP/UDP临时端口
 
 [Ephemeral port](https://www.wikiwand.com/zh/%E4%B8%B4%E6%97%B6%E7%AB%AF%E5%8F%A3)
