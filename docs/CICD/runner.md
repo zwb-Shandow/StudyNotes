@@ -2,6 +2,12 @@
 
 GitLab Runner 是一个应用程序，它与 GitLab CI/CD 一起运行管道中的作业。GitLab Runner 还可以在 Docker 容器中运行，也可以部署到Kubernetes 集群中。
 
+GitLab Runner有以下类型的runner，根据您想要访问的用户提供：
+
+- Shared runners: 所有组和项目都可以使用
+- Group runners: 该组中的所有项目和子组
+- Project runners: 特定项目可用
+
 ## 1. 注册 Runner
 
 安装应用程序后，您可以注册单个 Runner。Runners 是运行来自GitLab的 CI/CD jobs 的代理。
@@ -53,3 +59,9 @@ job:
 通过编辑 `config.toml` 文件配置 runner。该文件是 runner 安装过程中安装的。
 
 在该文件中，可以编辑特定 runner 或所有 runner 的配置。您可以指定日志记录和缓存等设置。您可以设置并发、内存、CPU 限制等
+
+
+
+
+
+https://docs.gitlab.cn/jh/ci/runners/runners_scope.html

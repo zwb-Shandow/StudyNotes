@@ -40,13 +40,38 @@ ulimit -c unlimited
 
 ### 1.2 修改 coredump 路径
 
-通过修改 /proc/sys/kernel/core_pattern 文件实现。
+使用 sysctl 命令更改 core 文件位置
 
 ```shell
-sudo sysctl -w kernel.core_pattern=/var/crash/core.%u.%e.%p
+sudo sysctl -w kernel.core_pattern=/var/crash/%e.%s.%t.core
 ```
 
+此命令将指定路径更新至 /proc/sys/kernel/core_pattern 文件。
+
+也可以通过在 /etc/sysctl.conf 中添加以下行来永久更改core文件路径
+
+```shell
+kernel.core_pattern="/var/crash/%e.%s.%t.core"
+```
+
+core_pattern中的格式化符号说明
+
+| Format specifiers | Description         |
+| ----------------- | ------------------- |
+| %e                | 文件名              |
+| %g                | 进程运行时使用的gid |
+| %p                | 进程的pid           |
+| %s                | 导致转储的信号      |
+| %t                | 转储发生的时间      |
+| %u                | 进程运行时的uid     |
+
 ## 2. coredump 调试
+
+apport-unpack安装
+
+```shell
+apt install apport
+```
 
 crash 文件解压
 
@@ -60,7 +85,80 @@ apport-unpack *.crash <target directory>
 gdb <program> <CoreDump file>
 ```
 
-## 3. C++异常无法在堆栈中展开
+## 3. gdb 常用命令
+
+启动gdb调试会话
+
+```shell
+gdb <executable>
+```
+
+设置断点
+
+```shell
+b <function>     # break，在函数处设置断点
+b <line_number>  # break，在代码行号处设置断点
+```
+
+运行并停在第一个断点
+
+```shell
+r  # run，运行程序
+```
+
+单步调试
+
+```shell
+s  # step，单步跟踪，进入函数
+n  # next，单步跟踪，不进入函数
+```
+
+继续运行
+
+```shell
+c  # continue，继续运行
+```
+
+打印变量
+
+```shell
+p <variable>  # print，打印变量值
+```
+
+打印堆栈信息
+
+```shell
+bt       # backtrace，打印简短堆栈信息
+bt full  # 打印完整堆栈信息，包括参数值
+```
+
+切换和退出线程
+
+```shell
+thread <thread_id>   # 切换到指定线程
+info threads         # 显示所有线程
+thread apply all bt  # 显示所有线程堆栈信息
+```
+
+其他
+
+```shell
+display <exp>             # 每次停止时，自动打印表达式 exp 的值
+undisplay <exp>           # 取消显示表达式的值
+
+set var <name> = <value>  # 设置变量的值
+
+list                      # 显示源代码
+list <function>           # 显示函数的源代码
+
+jump <location>           # 跳转到指定的代码位置
+
+shell <cmd>               # 在gdb中执行shell命令
+```
+
+
+
+## 4. C++异常无法在堆栈中展开
 
 GCC8以下的编译器无法记录C++抛出的异常，该问题在GCC8修复。
 

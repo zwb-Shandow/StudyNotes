@@ -345,10 +345,78 @@ ros2 bag play --storage-format=<format_identifier>
 
 ## rosbag2 源码解析
 
-### rosbag2_storage
+### rosbag2_storage API层
 
-- storage_interfaces：存储接口定义
-  - read_only_interface.hpp：只读存储接口
-  - read_write_interface.hpp：读写存储接口
+rosbag_storage API与ROS2无关，因为它只读取和写入抽象的二进制消息，这些消息在给定一些元信息的情况下定义良好。
 
-- storage_factory.hpp：存储工厂类，用于创建不同存储插件实例
+#### 目录
+
+rosbag2_storage的目录结构如下：
+
+```
+|- storage_interface               // 接口定义
+	|- base_info_interface.hpp
+	|- base_io_interface.hpp
+	|- base_read_interface.hpp
+	|- base_write_interface.hpp
+	|- read_only_interface.hpp     // 插件开发需继承的接口，具有只读权限
+	|- read_write_interface.hpp    // 插件开发需继承的接口，具有读写权限
+|- bag_metadata.hpp                // bag元信息
+|- logging.hpp
+|- metadata_io.hpp                 // bag元数据的io接口
+|- ros_helper.hpp
+|- serialized_bag_message.hpp      // 序列化后的数据
+|- storage_factory_interface.hpp   // 存储插件工厂类接口
+|- storage_factory.hpp             // 存储插件工厂类
+|- storage_filter.hpp              // 回放时话题过滤列表
+|- storage_options.hpp             // 数据包存储时参数，包含包大小限制、时长限制、缓存限制等
+|- storage_traits.hpp
+|- topic_metadata.hpp              // 话题元信息，包含名称、类型、序列化格式及qos规则等
+|- visbility_control.hpp
+```
+
+
+
+接口继承关系如下：
+
+![](/home/trunk/Documents/personal/StudyNotes/docs/Pic/rosbag2.png)
+
+
+
+### rosbag2 API层
+
+#### 目录
+
+```
+|- cache
+	|- cache_consumer.hpp
+	|- message_cache_buffer.hpp
+	|- message_cache.hpp
+|- converter_interfaces
+	|- serialization_format_converter.hpp
+	|- serialization_format_deserializer.hpp
+	|- serialization_format_serializer.hpp
+|- reader_interfaces
+	|- base_reader_interface.hpp        // 只读抽象类接口
+|- readers
+	|- sequential_reader.hpp
+|- types
+	|- introspection_message.hpp
+|- writer_interfaces
+	|- base_writer_interface.hpp
+|- writers
+	|- sequential_write.hpp
+|- converter_options.hpp
+|- converter.hpp
+|- info.hpp
+|- logging.hpp
+|- reader.hpp
+|- writer.hpp
+|- serialization_format_converter_factory_interface.hpp
+|- serialization_format_converter_factory.hpp
+|- storage_options.hpp
+|- types.hpp
+|- typesupport_helpers.hpp
+|- visbility_control.hpp
+```
+

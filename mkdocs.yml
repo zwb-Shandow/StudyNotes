@@ -17,16 +17,22 @@ nav:
     - C++: C++.md 
     - CICD: cicd.md
     - CMake: cmake.md
-    - CSAPP: csapp.md
     - MIT: MIT.md
     - Docker: docker.md
     - Data Structure And Algorithm: data_and_algorithm.md
+    - Database: database.md
     - Design Pattern: design_pattern.md
     - Git: git.md
     - Linux: linux.md
     - Nginx: nginx.md
     - Python: python.md
     - Software Engineering: se.md
-    - MiddleWare: middleware.md
     - UnitTest: unittest.md
     - 类型系统: 类型系统.md
+    - 计算机网络: network.md
+    - 自动驾驶: 自动驾驶.md
+    - interview: interview.md
+    - 书单: book.md
+    - 操作系统: os.md
+    - 深度学习: deep_learning.md
+    - CUDA: cuda.md
