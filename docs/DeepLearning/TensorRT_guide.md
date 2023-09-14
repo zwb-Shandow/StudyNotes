@@ -128,7 +128,33 @@ OpenVINO被广泛应用于各种计算机视觉和嵌入式深度学习应用，
 
 ### 3.2 TensorRT 网络构建
 
-有多种方式构建网络, 第一种是使用TensorRT安装包带的`trtexec`工具构建网络, 另一种是使用C++或者Python构建网络
+有多种方式构建网络, 第一种是使用TensorRT安装包带的`trtexec`工具构建网络, 另一种是使用C++或者Python构建网络。
+
+TensorRT 可通过优化网络计算图提高模型效率，相关的优化方法如下：
+
+1. Weight & Activation Precision Calibration(Manual)
+
+   通过将模型量化为 INT8 来最大化吞吐量，同时保持准确性
+
+2. Layer & Tensor Fusion(Auto)
+
+   通过融合内核中的节点来优化 GPU 内存和带宽的使用
+
+3. Kernel Auto-tuning
+
+   根据目标GPU平台选择最佳数据层和算法
+
+4. Dynamic Tensor Memory
+
+   最大限度地减少内存占用并有效地为张量重新使用内存
+
+5. Multi-stream Execution
+
+   可并行处理多个输入流的可扩展设计
+   
+6. Time Fusion
+   
+   使用动态生成的内核随时间步长优化循环神经网络
 
 #### 3.2.1 trtexec
 
@@ -405,7 +431,446 @@ for (int i = 0; i < num_io_tensors; ++i) {
 }
 ```
 
-## 参考链接
+## 4. TensorRT API
+
+> 以下整理的接口中，未提及被弃用的接口。
+
+ ### 4.1 构建期
+
+#### 4.1.1 IBuilder
+
+用于构建优化后的引擎。
+
+- 网络构建相关
+
+  ```c++
+  INerworkDefinition* createNetworkV2(NetworkDefinitionCreationFlags flags);
+  IHostMemory* buildSerializedNetwork(INetworkDefinition& network, IBuilderConfig& config);
+  bool isNetworkSupported(INetworkDefinition const& network, IBuilderConfig const& config) const;
+  ```
+
+- 多线程
+
+  ```c++
+  bool setMaxThreads(int32_t maxThreads);
+  int32_t getMaxThreads() const;
+  ```
+
+- 配置相关
+
+  ```c++
+  IBuilderConfig* createBuilderConfig();
+  IOptimizationProfile* createOptimizationProfile();
+  ```
+
+- 内存管理
+
+  ```c++
+  // 默认内存分配器为 cudaMalloc/cudaFree
+  void setGpuAllocator(IGpuAllocator* allocator);
+  ```
+
+- 硬件支持
+
+  ```c++
+  bool platformHasFastFp16() const;
+  bool platformHasFastInt8() const;
+  bool platformHasTf32() const;
+  // 获取 DLA 可以支持的最大批量大小
+  int32_t getMaxDLABatchSize() const;
+  // 返回可用于此 builder 的 DLA 引擎的数量
+  int32_t getNbDLACores() const;
+  ```
+
+- 插件相关
+
+  ```c++
+  // 获取插件注册表
+  IPluginRegistry& getPluginRegistry();
+  ```
+
+#### 4.1.2 IBuilderConfig
+
+用于配置引擎构建的参数。
+
+- 引擎优化相关
+
+  ```c++
+  // 设置进行引擎优化时的平均计时迭代次数
+  // 1. 在构建引擎时，TensorRT 会运行网络进行计时，收集每层的耗时信息
+  // 2. 设置多次迭代后取平均值，可以让计时更准确，但也会增加构建引擎的时间
+  void IBuilderConfig setAvgTimingIterations(int32_t avgTiming);
+  int32_t getAvgTimingIterations() const;
+  
+  // 设置构建引擎的功能
+  // kSTANDARD: TensorRT 流没有针对安全运行时的限制
+  // kSAFETY: TensorRT 流具有针对安全运行时的限制
+  // kDLA_STANDALONE
+  void setEngineCapability(EngineCapability capability);
+  EngineCapability getEngineCapability() const;
+  
+  // 设置引擎构建过程中的一些标志位，启动或禁用某些优化特性
+  // kFp16: 启用 FP16 精度模式
+  // kDEBUG: 启用调试模式
+  // ...
+  void setFlags(BuilderFlags flags);
+  BuildFlags getFlags() const;
+  void clearFlag(BuilderFlag builderFlag);
+  void setFlag(BuilderFlag builderFlag);
+  bool getFlag(BuilderFlag builderFlag) const;
+  
+  // 为网络中的某个层设置优化时使用的设备类型
+  // 1. 默认情况下，层的设备选择是自动的，以获得最佳性能
+  // 2. 设备类型包括: kGPU,kDLA
+  void setDeviceType(ILayer const* layer, DeviceType deviceType);
+  DeviceType getDeviceType(ILayer const* layer) const;
+  void reset DeviceType(ILayer const* layer);
+  bool isDeviceTypeSet(ILayer const* layer) const;
+  void resetDeviceType(ILayer const* layer);
+  void setDefaultDeviceType(DeviceType deviceType);
+  DeviceType getDefaultDeviceType() const;
+  
+  // 检查网络的层是否可以在 DLA 上运行
+  bool canRunOnDLA(ILayer const* layer) const;
+  void setDLACore(int32_t dlaCore);
+  int32_t getDLACore() const;
+  
+  // 配置重置
+  void reset();
+  
+  // 添加优化配置文件(包含不同输入尺寸下的网络配置)
+  int32_t addOptimizationProfile(IOptimizationProfile const* profile);
+  int32_t getNbOptimizationProfiles() const;
+  
+  // 设置构建引擎时使用的算法选择
+  // 具体的候选算法有：
+  //  - 卷积层： cudnn/cufft/wnograd
+  //  - 全连接层: cublas/cufft
+  //  - 池化层: cudnn/generic
+  //  - Softmax 层: fast_div/fast_log
+  void setAlgorithmSelector(IAlgorithmSelector* selector);
+  IAlgorithmSelector* getAlgorithmSelector() const;
+  
+  // 设置构建引擎时的优化级别
+  // 1. 级别范围 0 ~ 5，默认为 3
+  // 2. 优化级别越高，引擎构建时间越久，获得的引擎性能更好
+  void setBuilderOptimizationLevel(int32_t level);
+  int32_t getBuilderOptimizationLevel();
+  ```
+
+  - INT8 量化引擎优化项
+
+    ```c++
+    // 为 INT8 量化精度模式设置校验器
+    // 1. 当构建 INT8 引擎时，需要一个校验器类来收集层激活的范围信息，用于确定量化参数
+    // 2. TensorRT 在构建引擎时，会调用校验器的 getBatch() 等接口来获取校准数据
+    // 3. 用户需要继承 IInt8Calibrator 接口，实现读取校准数据等逻辑
+    // 4. 如果不设置，则使用默认的随机数据做校准
+    void setInt8Calibrator(IInt8Calibrator* calibrator);
+    
+    // 为 INT8 量化精度模式设置校准配置文件
+    // 1. 可以为不同输入大小设置采样配置
+    // 2. 在 INT8 引擎构建时，保证每种大小的输入都被采样用于校准
+    bool setCalibrationProfile(IOptimizationProfile const* profile);
+    IOptimizationProfile const* getCalibrationProfile();
+    
+    // 设置 INT8 量化模式下的量化标志
+    void setQuantizationFlags(QuantizationFlags flags);
+    QuantizationFlags getQuantizationFlags() const;
+    void clearQuantizationFlag(QuantizationFlag flag);
+    boid setQuantizationFlag(QuantizationFlag flag);
+    bool getQuantizationFlag(QuantizationFlag flag) const;
+    ```
+
+- 异步构建相关
+
+  ```c++
+  void setProfileStream(const cudaStream_t stream);
+  cudaStream_t getProfileStream() const;
+  
+  // 用于设置构建引擎时使用的最大辅助CUDA流的数量
+  void setMaxAuxStreams(int32_t nbStreams);
+  int32_t getMaxAuxStreams() const;
+  ```
+
+- 资源管理
+
+  ```c++
+  // 限制 TensorRT 对 GPU 或 CPU 内存的使用
+  void setMemoryPoolLimit(MemroyPoolType pool, std::size_t poolSize);
+  std::size_t getMemoryPoolLimit(MemoryPoolType pool) const;
+  ```
+
+- GPU 体系结构相关
+
+  ```c++
+  // 设置构建引擎时的硬件兼容性级别
+  // 1. 控制生成的引擎能够在哪些硬件上运行
+  // 2. 默认是兼容所有 GPU
+  void setHardwareCompatibilityLevel(HardwareCompatibilityLevel hardwareCompatibilityLevel);
+  HardwareCompatibilityLevel getHardwareCompatibilityLevel() const;
+  ```
+
+- Debug
+
+  ```c++
+  void setProfilingVerbosity(ProfilingVerbosity verbosity);
+  ProfilingVerbosity getProfilingVerbosity() const;
+  
+  // 为引擎创建时间测量缓存
+  // 1. 创建 ITimingCache 对象，用于测量引擎执行的时间
+  // 2. 需要提供 GPU 内存用于存放时间记录
+  // 3. 可以分析整个引擎及每个层的执行时间，用来判断性能瓶颈
+  ITimingCache* createTimingCache(void const* blob, std::size_t size) const;
+  bool setTimingCache(ITimingCache const& cache, bool ignoreMismatch);
+  ITimingCache const* getTimingCache() const;
+  ```
+
+#### 4.1.3 IOptimizationProfile
+
+用于配置动态网络的优化配置文件。每个优化配置文件指定了一组输入尺寸范围和相应的优化方案。在运行时，根据实际输入形状，选择合适的优化方案来执行。这样可以处理可变形状输入，而无需为每种形状都构建引擎。
+
+```c++
+// 设置输入张量的最大、最优及最小形状
+bool setDimensions(char const* inputName, OptProfileSelector select, Dims dims);
+Dims getDimensions(char const* inputName, OptProfileSelector select) const;
+```
+
+### 4.2 运行期
+
+#### 4.2.1 IRuntime
+
+用于管理推理的整个流程，加载反序列化引擎，资源分配和销毁等。
+
+- 从流中反序列化引擎(**重要**)
+
+  ```c
+  ICudaEngine* deserializeCudaEngine(void const* blob, std::size_t size);
+  ```
+
+- 设置、获取网络使用的 DLA 内核数
+
+  ```c
+  void setDLACore(int32_t dlaCore);
+  // 获取当前可访问的 DLA 内核数
+  int32_t getDLACore();
+  // 获取硬件所支持的 DLA 核心，返回 -1 时代表硬件 DLA 不可用
+  int32_t getNbDLACores() const;
+  ```
+
+- 资源分配相关
+
+  ```c
+  void setGpuAllocator(IGpuAllocator* allocator);  // 默认为 cudaMalloc/cudaFree
+  ```
+
+- 多线程
+
+  ```c
+  // 默认为 1，当大于 1 时，会促使 TensorRT 使用多线程算法
+  bool setMaxThreads(int32_t maxThreads);
+  // 当前运行时环境可用的最大线程数
+  int32_t getMaxThreads() const;
+  ```
+
+- 运行时使用的临时目录
+
+  在某些平台上，TensorRT运行时可能需要创建并使用具有读/写/执行权限的临时文件来实现运行时功能。
+
+  - 在UNIX/Linux平台上，TensorRT将首先尝试TMPDIR环境变量，然后返回/tmp
+
+  - 在Windows上，TensorRT将尝试TEMP环境变量。
+  ```c
+  void setTemporaryDirectory(char const* path);
+  char const* getTemporaryDirectory() const;
+  ```
+  
+- 获取插件注册表
+
+  ```c
+  IPluginRegistry& getPluginRegistry();
+  ```
+
+- 控制是否允许在引擎中包含 CPU 可执行代码
+  - 安全性：默认情况下，引擎不允许包含 host 代码，可以防止恶意代码注入。
+  - 性能优化：一些插件可能需要包含 host 代码来完成初始化等工作。允许 host 代码可以减少 CPU 和 GPU 之间的同步。
+  
+  ```c
+  void setEngineHostCodeAllowed(bool allowed);
+  bool getEngineHostCodeAllowed() const;
+  ```
+
+- 设置、获取 ErrorRecorder
+
+  ErrorRecorder 用于异常处理。
+  
+  ```c
+  void setErrorRecorder(IErrorRecorder* recorder);
+  IErrorRecorder* getErrorRecorder() const;
+  ```
+
+#### 4.2.2 ICudaEngine
+
+封装了优化后的网络，容纳了执行推理需要的所有信息，是部署到硬件平台上的关键组件。
+
+- 引擎信息查询
+
+  ```c
+  // 根据张量名称获取张量形状
+  Dims getTensorShape(char const* tensorName) const;
+  // 根据张量名称获取张量类型
+  DataType getTensorDataType(char const* tensorName) const;
+  // 获取网络中的层数
+  int32_t getNbLayers() const;
+  // 获取 IO 张量数量
+  int32_t getNbIOTensors() const;
+  // 获取 IO 张量名称
+  char const* getIOTensorName(int32_t index) const;
+  // 在构建期确定的输入/输出张量位置(CPU/GPU)
+  TensorLocation getTensorLocation(char const* tensorName) const;
+  // 是否可以重新设置引擎
+  bool isRefittable() const;
+  // 获取张量格式
+  TensorFormat getTensorFormat(char const* tensorName) const;
+  char const* getTensorFormatDesc(char const* tensorName) const;
+  char const* getTensorFormatDesc(char const* tensorName, int32_t profileIndex) const;
+  // 获取与引擎关联的网络名称
+  char const* getName() const;
+  // 在优化配置文件下，获取输入张量的最小/最佳/最大尺寸
+  Dims getProfileShape(char const* tensorName, int32_t profileIndex, OptProfileSelector select) const;
+  // 确定该引擎的执行能力
+  EngineCapability getEngineCapability() const;
+  // 查询引擎是否是隐式批处理
+  bool hasImplicitBatchDimension() const;
+  //
+  TacticSources getTacticSources() const;
+  //
+  ProfilingVerbosity getProfilingVerbosity() const;
+  // 返回引擎的硬件兼容级别, Amphere 及更新的架构才支持
+  HardwareCompatibilityLevel getHardwareCompatibilityLevel() const;
+  // 返回该引擎使用的辅助流的数量
+  int32_t getNbAuxStreams() const;
+  // 判断张量是否是形状推理的输入或输出;
+  // 形状推理(Shape Inference)指的是TensorRT根据网络定义自动推导出各个张量的形状信息的功能。
+  // 知道一个张量是否用于形状推理,可以帮助我们正确设置动态形状网络的优化配置文件。
+  bool isShapeInferenceIO(char const* tensorName) const;
+  // 根据张量名称确定是输入还是输出张量
+  TensorIOMode getTensorIOMode(char const* tensorName) const;
+  // 执行上下文所需要的 device 内存量
+  size_t getDeviceMemorySize() const;
+  // 获取每个组件的字节数
+  int32_t getTensorBytesPerComponent(char const* tensorName) const;
+  int32_t getTensorBytesPerComponent(char const* tensorName, int32_t profileIndex) const;
+  // 获取元素包含的组件数
+  int32_t getTensorComponentsPerElement(char const* tensorName) const;
+  int32_t getTensorComponentsPerElement(char const* tensorName, int32_t profileIndex) const;
+  ```
+
+- 序列化引擎
+
+  ```c
+  IHostMemory* serialize() const;
+  ```
+
+- 执行上下文管理
+
+  ```c
+  IExecutionContext* createExecutionContext();
+  IExecutionContext* createExecutionContextWithoutDeviceMemory();
+  ```
+
+- 异常处理
+
+  ```c
+  void setErrorRecorder(IErrorRecorder* recorder);
+  IErrorRecorder* getErrorRecorder() const;
+  ```
+
+#### 4.2.3 IExecutionContext
+
+负责具体的推理执行过程，是推理操作的最终执行接口。
+
+允许一个 CudaEngine 具有多个运行 context, 每个 context 可以使用不同的 Batch 大小，如果网络模型的输入尺寸支持动态调整，那么每个上下文还可以使用各自不同的尺寸输入。
+
+- 执行控制
+
+  ```c
+  // 同步推理
+  bool executeV2(void* const* bindings);
+  // 异步推理
+  bool enqueueV3(cudaStream_t stream);
+  ```
+
+- 输入输出管理
+
+  ```c
+  bool setInputShape(char const* tensorName, Dims const& dims);
+  Dims getTensorShape(char const* tensorName) const;
+  // 输入张量的所有动态尺寸是否已指定
+  bool allInputDimensionsSpecified() const;
+  // 指定的输入是否已绑定
+  bool allInputShapesSpecified() const;
+  ```
+
+- 选项配置
+
+  ```c
+  void setProfiler(IProfiler* profiler);
+  IProfiler* getProfiler() const;
+  int32_t getOptimizationProfile() const;
+  bool setOptimizationProfileAsync(int32_t profileIndex, cudaStream_t stream);
+  ```
+  
+- 引擎查询
+
+  ```c
+  ICudaEngine const& getEngine() const;
+  // 查询张量的布局信息
+  Dims getTensorStrides(char const* tensorName) const;
+  ```
+
+- 上下文管理
+
+  ```c
+  void setName(char const* name);
+  char const* getName() const;
+  // 设置 GPU 内存以供执行上下文使用
+  void setDeviceMemory(void* memory);
+  //
+  bool setTensorAddress(char const* tensorName, void* data);
+  void const* getTensorAddress(char const* tensorName) const;
+  bool setInputTensorAddress(char const* tensorName, void const* data);
+  void* getOutputTensorAddress(char const* tensorName) const;
+  ```
+
+- debug
+
+  ```c
+  void setDebugSync(bool sync);
+  bool getDebugSync() const;
+  ```
+
+
+
+## 5. Q&A
+
+### 5.1 模型精度降低为 fp16 及 int8 有什么不同？
+
+1. fp32 -> fp16
+
+   fp32 与 fp16 都是浮点数精度，量化过程比较简单，TensorRT 会直接裁剪 fp32 的尾数部分，保留 16 位有效数字，转换为 fp16.
+
+2. fp32 -> int8
+
+   - 收集 FP32 模型使用真实数据做推理的激活值分布。
+
+   - 根据这些激活值分布,计算出每个张量合适的缩放因子。
+
+   - 在 INT8 推理时,使用这些缩放因子对值进行缩放,使 INT8 模型精度尽量接近 FP32。
+
+   所以,要使用 TensorRT 的 INT8 推理,需要实现 `IInt8Calibrator` 接口,提供校准数据,生成缩放因子。然后在生成 INT8 引擎时,将 `IInt8Calibrator` 实例传递给 builder,以完成量化过程。只有通过校准才能使 INT8 模型在保证精度的前提下获得最大的加速效果。
+
+## 6. 参考链接
 
 [1] [Deep Learning Training vs. Inference: What’s the Difference?](https://www.xilinx.com/applications/ai-inference/difference-between-deep-learning-training-and-inference.html)
 
