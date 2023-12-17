@@ -82,8 +82,41 @@ ssh-keygen -F ip
 ssh-keygen -R ip
 ```
 
+## 4. sftp
+
+> sftp 作为 ssh 的子模块，无需额外安装，ssh 服务默认开启 sftp
+>
+> 配置文件位于 /etc/ssh/sshd_config
+
+### 4.1 创建 SFTP 用户账户
+
+```shell
+# 创建用户组
+sudo addgroup sftp
+# 创建新用户，添加到 SFTP 组
+sudo useradd -m sftp_user -g sftp
+# 为 sftp_user 设置密码
+sudo passwd sftp_user
+# 权限设置：用户对自己的家目录具有完全访问权限，对系统上其他用户没有访问权限
+sudo chmod 700 /home/sftp_user
+```
+
+### 4.2 登录 SFTP
+
+```shell
+sftp sftp_user@127.0.0.1
+```
+
+### 4.3 从 SFTP 拉取文件
+
+```shell
+sftp sftp_user@127.0.0.1:/home/sftp_user/file_name
+```
+
 ## 参考链接
 
 [1] [SSH基本知识](https://wangdoc.com/ssh/basic)
 
 [2] [.ssh目录下各文件的作用](https://blog.csdn.net/qq_16268979/article/details/108899178)
+
+[3] [如何在ubuntu20.04 Linux上设置SFTP服务器](https://www.onitroad.com/jc/linux/ubuntu/faq/how-to-setup-sftp-server-on-ubuntu-20-04.html)

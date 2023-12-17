@@ -201,5 +201,10 @@ pkg-config --cflags --libs <package_name>  # 显示库的编译器标志及链�
 ## 11. du & df
 
 - [du (Disk Usage)](http://linux.51yip.com/search/du)
-
 - [df (Disk Free)](http://linux.51yip.com/search/df)
+
+## 12. hexdump
+
+## 13. objdump
+
+用于反汇编
